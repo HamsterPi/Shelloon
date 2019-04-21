@@ -1,4 +1,4 @@
-#Shelloon by Connell Kelly
+#Shelloon - Connell Kelly
 #Language: Python 3.7
 #I hope the cowboy theme don't sour your milk.
 #My thanks for a good semester.
