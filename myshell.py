@@ -12,19 +12,19 @@ import socket
 import subprocess
 import sys
 
-def overwrite(data, args):
+def override(body, args):
 	"""Overwrites file with info or creates file containing input.\n"""
 	with open(args[0], "w+") as args:
-		for i in data:
+		for i in body:
 			#Writes data to file.
 			args.write(i)
 			#Adds newline character to end of file.
 			args.write("\n")
 
-def append(data, args):
+def attach(body, args):
 	"""Appends input to file or creates file containing input.\n"""
 	with open(args[0], "a+") as args:
-		for i in data:
+		for i in body:
 			args.write(i)
 			args.write("\n")
 
