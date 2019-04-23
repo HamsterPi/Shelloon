@@ -1,7 +1,5 @@
-#Shelloon by Connell Kelly (Student Number: 17480902)
+#Shelloon by Connell Kelly
 #Language: Python 3.5.2
-#I hope the cowboy theme doesn't sour your milk.
-#My thanks for a good semester.
 
 #Relevant modules.
 from cmd import Cmd
@@ -95,22 +93,77 @@ class Shelloon(Cmd):
 
 	def do_environ(self, args):
 		"""Lists all environment strings.\n"""
-		#List of environment strings.
-		elist = []
-		#For each item in the OS environment.
-		for i in os.environ:
-			#If it is empty, add "NULL" to it's respective postion in the list.
-			if os.environ[i] == "":
-				elist.append(i + "=NULL")
-			#Otherwise, append the environment key and value to the list.
-			else:
-				elist.append(i + "=" + os.environ[i])
-		#Join and print the final list elements and add newline for each.
-		print("\n".join(elist) + "\n")
+		#Converts args to a list.
+		elist = args.split()
+		try:
+			#For I/O redirection overwrite.
+			if elist[0] == ">":
+				#List for environment keys and values.
+				keyval = []
+				for i in os.environ:
+					#If it is empty, add "NULL" to it's respective postion in the list.
+					if os.environ[i] == "":
+						keyval.append(i + "=NULL")
+					#Otherwise, append the environment key and value to the list.
+					else:
+						keyval.append(i + "=" + os.environ[i])
+				#Overwrite environment strings to a specific file.
+				override(keyval, elist[1:])
+			#For I/O redirection adding.
+			elif elist[0] == ">>":
+				keyval = []
+				for i in os.environ:
+					if os.environ[i] == "":
+						keyval.append(i + "=NULL")
+					else:
+						keyval.append(i + "=" + os.environ[i])
+				#Add environment strings to a specific file.
+				attach(keyval, elist[1:])
+		#If there is no I/O redirection, just print environ list.
+		except IndexError:
+			print("\n".join(environ_lister()))
 
 	def do_echo(self, args):
 		"""Outputs args onto display with newline.\n"""
-		print(str(args + "\n"))
+		#Puts arguments into a list.
+		alist = args.split()
+		#Counter for determining input positioning.
+		counter = 0
+		#List containing echo inputs.
+		inplist = []
+		#For each item from the start to the end of the argument list.
+		for i in range(0, len(alist)):
+			#For I/O redirection overwrite.
+			if alist[i] == ">":
+				#Joins arguments to a string.
+				ewords = " ".join(inplist)
+				#Overrites string to specified file.
+				override([ewords], alist[i+1:])
+				break
+			#For I/O redirection adding.
+			elif alist[i] == ">>":
+				#Joins arguments to a string.
+				ewords = " ".join(inplist)
+				#Adds string to specified file.
+				attach([ewords], alist[i+1:])
+				break
+			else:
+				#Adds non-redirection arguements to a list.
+				inplist.append(alist[i])
+				#Add to counter to specify positioning.
+				counter += 1
+		#Once loop has been broken, determine if function has reached list limit.
+		if counter == len(alist):
+			#Print the argument lists as strings.
+			print(" ".join(inplist))
+
+	def do_help(self, args):
+		"""Displays user manual.\n"""
+		#Set the manual file to the "man" variable.
+		with open("README.md", 'r') as man:
+			#Print each line in the user manual.
+			for line in man.readlines():
+				print(line)
 
 	def do_pause(self, arg):
 		"""Pauses shell until 'Enter' is pressed.\n"""
