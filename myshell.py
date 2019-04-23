@@ -1,5 +1,6 @@
-#Shelloon by Connell Kelly
+#Shelloon by Connell Kelly (Student Number: 17480902)
 #Language: Python 3.5.2
+#My thanks for a good semester.
 
 #Relevant modules.
 from cmd import Cmd
@@ -28,6 +29,17 @@ def override(inp, file):
 		for i in inp:
 			j.write(i)
 			j.write("\n")
+
+def dir_str(direc=None):
+	"""Finds data in directory and returns as a string.\n"""
+	#For specified directory.
+	if direc != None:
+		#Returns string of specified directory data.
+		return "\n".join([i for i in os.listdir(direc)])
+	#For unspecified directory.
+	else:
+		#Returns string of current directory data.
+		return '\n'.join([i for i in os.listdir(os.getcwd())])
 
 #Shell class and functions.
 class Shelloon(Cmd):
@@ -67,29 +79,48 @@ class Shelloon(Cmd):
 
 	def do_clr(self, args):
 		"""Will clear the command prompt of all text.\n"""
-		os.system('clear')
+		os.system("clear")
 
 	def do_dir(self, args):
 		"""Lists current directories in use.\n"""
-		flag = False
-		#If user doesn't specify a directory, use current one.
-		if args == "":
-			#Observe each item in directory and print it.
-			for i in os.listdir():
-				#This directory is not empty.
-				flag = True
-				print(i)
-			#Determines if directory is empty.
-			if flag == False:
-				print("This here directory is bone-dry.")
-		#Otherwise, move on to specified directory.
-		else:
-			#Observe each item in the specified directory and print it.
-			for i in os.listdir(args):
-				flag = True
-				print(i)
-			if flag == 0:
-				print("This here directory is bone-dry.")
+		#Converts command-line arguments to a list.
+		args = args.split()
+		try:
+			#For standard input.
+			if args[0] == "<":
+				#Open inputted file as a directory.
+				with open(args[1], "r") as i:
+					#Creates list of all lines in specified file.
+					datalist = [args.strip() for args in i.readlines()]
+				#For overwrite redirection.
+				if args[2] == ">":
+					#Overwrite data in specified file.
+					override(dir_str(datalist[0]), args[3:])
+				#For add redirection.
+				elif args[2] == ">>":
+					#Add data to specified file.
+					attach(dir_str(datalist[0]), args[3:])
+				else:
+					#For non-redirection, print data from directory.
+					print(dir_str(datalist[0]))
+			elif args[1] == ">":
+				#Overwrites to specified file.
+				override(dir_str(args[0]), args[2:])
+			elif args[1] == ">>":
+				#Adds to specified file.
+				attach(dir_str(args[0]), args[2:])
+			elif args[0] == ">":
+				#Overwriting without specified directory.
+				override([dir_str()], args[1:])
+			elif args[0] == ">>":
+				#Adding without specified directory.
+				attach([dir_str()], args[1:])
+			else:
+				#Prints data from specified directory.
+				print(dir_str(args[0]))
+		except IndexError:
+			#Prints data from current directory.
+			print(dir_str())
 
 	def do_environ(self, args):
 		"""Lists all environment strings.\n"""
@@ -121,7 +152,14 @@ class Shelloon(Cmd):
 				attach(keyval, elist[1:])
 		#If there is no I/O redirection, just print environ list.
 		except IndexError:
-			print("\n".join(environ_lister()))
+			keyval = []
+			for i in os.environ:
+				if os.environ[i] == "":
+					keyval.append(i + "=NULL")
+				else:
+					keyval.append(i + "=" + os.environ[i])
+			#Print joined list of of environment keys and values.
+			print("\n".join(keyval))
 
 	def do_echo(self, args):
 		"""Outputs args onto display with newline.\n"""
@@ -160,11 +198,11 @@ class Shelloon(Cmd):
 	def do_help(self, args):
 		"""Displays user manual.\n"""
 		#Set the manual file to the "man" variable.
-		with open("README.md", 'r') as man:
+		with open("readme.md", "r") as man:
 			#Print each line in the user manual.
 			for line in man.readlines():
 				print(line)
-
+		
 	def do_pause(self, arg):
 		"""Pauses shell until 'Enter' is pressed.\n"""
 		pause = input()
@@ -183,7 +221,7 @@ def batch_file():
 			#Collect commands.
 			commandlines = args.readlines()
 			#Allows prompt to end after txt commands.
-			commandlines.append('quit')
+			commandlines.append("quit")
 			#Queue all batch file commands.
 			shell.cmdqueue = commandlines
 			#Loop through each command and end.
