@@ -1,5 +1,5 @@
-shelloon V1.0 by connell kelly (student number: 17480902)
-this is a simple shell built upon python 3.5.2 for a ca216 assignment.
+shelloon V1.0 by connell kelly
+this is a simple shell built upon python 3.5.2
 
 legend:
 :~$ - indicates usage.
